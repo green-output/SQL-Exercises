@@ -16,7 +16,7 @@
 
 --6) Which accidents involved three or more casualties from the same age band (ignoring -1 records)?
 
---7) What was the average age among casualties on bike accidents with at least 5 victims?
+--7) What was the average age among casualties on bike (ID 1) accidents with at least 5 victims?
 
 --8) What was the amount of fatal casualties in accidents occurred at roads with 30 km/h speed limit?
 
