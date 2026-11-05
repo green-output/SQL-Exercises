@@ -64,13 +64,22 @@ FROM (
 WHERE cnt >= 3;
 
 
---7) What was the average age among casualties on bike accidents with at least 5 victims?
+--7) What was the average age among casualties per each bike (ID 1) accident with at least 5 victims?
 
-SELECT C.Accident_Index, AVG(Age_of_Casualty) AS avg_age 
+SELECT C.Accident_Index, AVG(C.Age_of_Casualty)::INT AS avg_age 
 FROM Casualties AS C
 INNER JOIN Vehicles AS V ON C.Accident_Index = V.Accident_Index
 WHERE V.Vehicle_Type = 1 AND C.Accident_Index IN (SELECT Accident_Index FROM Casualties GROUP BY Accident_Index HAVING COUNT(*) > 4)
 GROUP BY C.Accident_Index;
+
+OPTION 2
+
+SELECT cas.accident_index, AVG(cas.age_of_casualty)::INT
+FROM (
+		SELECT accident_index FROM accidents WHERE number_of_casualties > 4
+) INNER JOIN casualties cas USING("accident_index")
+INNER JOIN (SELECT accident_index FROM vehicles WHERE vehicle_type = 1) vh USING("accident_index")
+GROUP BY cas.accident_index;
 
 
 --8) What was the amount of fatal casualties in accidents occurred at roads with 30 km/h speed limit?
