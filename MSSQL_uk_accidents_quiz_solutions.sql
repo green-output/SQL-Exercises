@@ -84,10 +84,10 @@ GROUP BY cas.accident_index;
 
 --8) What was the amount of fatal casualties in accidents occurred at roads with 30 km/h speed limit?
 
-SELECT COUNT(C.Accident_Index) AS fatal_count
-FROM Accidents AS A
-INNER JOIN Casualties AS C ON A.Accident_Index = C.Accident_Index
-WHERE C.Casualty_Severity = 1 AND A.Speed_limit = 30;
+SELECT COUNT(cas.casualty_reference) fatal_cnt
+FROM (SELECT accident_index FROM accidents WHERE speed_limit = 30) acc 
+INNER JOIN (SELECT accident_index, casualty_reference FROM casualties WHERE casualty_severity = 1) cas 
+	USING("accident_index");
 
 
 --9) Among accidents involving only 1 car, dense rank the top 5 engine capacity per driver age band (ignoring -1 records in both fields).
