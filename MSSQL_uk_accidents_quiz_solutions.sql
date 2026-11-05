@@ -54,15 +54,14 @@ GROUP BY urban_or_rural_area;
 
 --6) Which accidents involved three or more casualties from the same age band (ignoring -1 records)?
 
-SELECT DISTINCT Accident_Index, Age_Band_of_Casualty 
+SELECT DISTINCT accident_index, age_band_of_casualty, cnt
 FROM (
-	SELECT Accident_Index, Age_Band_of_Casualty, CASE WHEN LEAD(Accident_Index) OVER(ORDER BY Accident_Index) = Accident_Index 
-		AND LEAD(Age_Band_of_Casualty) OVER(ORDER BY Accident_Index) = Age_Band_of_Casualty 
-		AND LEAD(Age_Band_of_Casualty, 2) OVER(ORDER BY Accident_Index) = Age_Band_of_Casualty THEN 'Match'
-		ELSE 'Not' END AS checker
-	FROM Casualties
-	WHERE Age_Band_of_Casualty <> -1) AS temp
-WHERE checker = 'Match';
+		SELECT accident_index, age_band_of_casualty, COUNT(*) cnt
+		FROM casualties
+		WHERE age_band_of_casualty <> -1
+		GROUP BY 1, 2
+	)
+WHERE cnt >= 3;
 
 
 --7) What was the average age among casualties on bike accidents with at least 5 victims?
