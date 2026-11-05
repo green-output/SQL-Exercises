@@ -43,14 +43,13 @@ SELECT * FROM tb1 WHERE rk < 4;
 
 --5) What was the percentage of accidents in urban and rural accidents?
 
-DECLARE @total REAL;
-SET @total = (SELECT COUNT(*) FROM Accidents);
-
-SELECT LocalType, COUNT(*) AS count_accid, ROUND(COUNT(*) / @total, 2) AS perct 
-FROM (SELECT *, CASE WHEN Urban_or_Rural_Area = 1 THEN 'Urban' WHEN Urban_or_Rural_Area = 2 THEN 'Rural' ELSE '' END AS LocalType
-		FROM Accidents
-		WHERE Urban_or_Rural_Area <> 3) AS temp
-GROUP BY LocalType;
+SELECT 
+	CASE WHEN urban_or_rural_area = 1 THEN 'Urban' ELSE 'Rural' END area_type, 
+	COUNT(*) counter, 
+	ROUND(100* (COUNT(*) / SUM(COUNT(*)) OVER()), 1) pct
+FROM accidents
+WHERE urban_or_rural_area <> 3
+GROUP BY urban_or_rural_area;
 
 
 --6) Which accidents involved three or more casualties from the same age band (ignoring -1 records)?
