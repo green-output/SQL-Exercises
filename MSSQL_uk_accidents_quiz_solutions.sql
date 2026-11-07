@@ -92,21 +92,22 @@ INNER JOIN (SELECT accident_index, casualty_reference FROM casualties WHERE casu
 
 --9) Among accidents involving only 1 car, dense rank the top 5 engine capacity per driver age band (ignoring -1 records in both fields).
 
-WITH tb1 AS (
-	SELECT V.Age_Band_of_Driver, temp.Engine_Capacity_CC, DENSE_RANK() OVER(PARTITION BY V.Age_Band_of_Driver ORDER BY temp.Engine_Capacity_CC DESC) AS rk
-	FROM (
-		SELECT Accident_Index, Engine_Capacity_CC, COUNT(*) AS count_accid
-		FROM Vehicles
-		WHERE Vehicle_Type = 9 AND Engine_Capacity_CC <> -1
-		GROUP BY Accident_Index, Engine_Capacity_CC
-		) AS temp
-	INNER JOIN Vehicles AS V ON temp.Accident_Index = V.Accident_Index
-	WHERE count_accid = 1 AND V.Age_Band_of_Driver <> -1
-	GROUP BY V.Age_Band_of_Driver, temp.Engine_Capacity_CC
-)
-
-SELECT * FROM tb1 WHERE rk < 6
-ORDER BY Age_Band_of_Driver, Engine_Capacity_CC DESC;
+WITH cte1 AS(
+SELECT 
+	age_band_of_driver, 
+	engine_capacity_cc,
+	DENSE_RANK() OVER(PARTITION BY age_band_of_driver ORDER BY engine_capacity_cc DESC) rnk
+FROM
+	(SELECT  
+		DISTINCT age_band_of_driver, 
+		engine_capacity_cc
+	FROM vehicles vh
+	WHERE age_band_of_driver <> -1 AND engine_capacity_cc <> -1
+	AND EXISTS (
+				SELECT 1 FROM accidents acc 
+				WHERE acc.accident_index = vh.accident_index AND number_of_vehicles = 1)) tab1)
+				
+SELECT * FROM cte1 WHERE rnk < 6 ORDER BY age_band_of_driver;
 
 
 --10) Which accidents involved different vehicle types including type n. 23?
