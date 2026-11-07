@@ -22,4 +22,4 @@
 
 --9) Among accidents involving only 1 car, dense rank the top 5 engine capacity per driver age band (ignoring -1 records in both fields).
 
---10) Which accidents involved different vehicle types including type n. 23?
+--10) Which accidents involved different vehicle types while including type n. 23?
