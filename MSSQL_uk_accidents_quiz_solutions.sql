@@ -98,19 +98,27 @@ SELECT
 	engine_capacity_cc,
 	DENSE_RANK() OVER(PARTITION BY age_band_of_driver ORDER BY engine_capacity_cc DESC) rnk
 FROM
-	(SELECT  
-		DISTINCT age_band_of_driver, 
+	(SELECT 
+		accident_index, 
+		age_band_of_driver, 
 		engine_capacity_cc
-	FROM vehicles vh
-	WHERE age_band_of_driver <> -1 AND engine_capacity_cc <> -1
-	AND EXISTS (
-				SELECT 1 FROM accidents acc 
-				WHERE acc.accident_index = vh.accident_index AND number_of_vehicles = 1)) tab1)
-				
+	FROM vehicles
+	WHERE age_band_of_driver <> -1 AND engine_capacity_cc <> -1) tab1
+INNER JOIN 
+	(SELECT accident_index FROM accidents WHERE number_of_vehicles = 1) acc USING(accident_index)
+	)
 SELECT * FROM cte1 WHERE rnk < 6 ORDER BY age_band_of_driver;
 
 
---10) Which accidents involved different vehicle types including type n. 23?
+--10) Which accidents involved different vehicle types while including type n. 23?
 
-SELECT DISTINCT A.Accident_Index, A.Vehicle_Type AS first_vehicle, B.Vehicle_Type AS second_vehicle FROM Vehicles AS A, Vehicles AS B
-WHERE A.Accident_Index = B.Accident_Index AND A.Vehicle_Type <> B.Vehicle_Type AND A.Vehicle_Type = 23;
+SELECT 
+	DISTINCT A.Accident_Index, 
+	A.Vehicle_Type AS first_vehicle, 
+	B.Vehicle_Type AS second_vehicle 
+FROM 
+	Vehicles AS A, 
+	Vehicles AS B
+WHERE A.Accident_Index = B.Accident_Index AND 
+	A.Vehicle_Type <> B.Vehicle_Type AND 
+	A.Vehicle_Type = 23;
